@@ -1,21 +1,18 @@
 import { Client, Collection } from 'discord.js';
 import { REST } from '@discordjs/rest';
-
 import { Sequelize } from 'sequelize';
 import { start } from './handlers/userData';
-
 import 'dotenv/config';
 import { glob } from 'glob';
-
 import interactionCreate from './events/interactionCreate';
 import messageCreate from './events/messageCreate';
 import ready from './events/ready';
 
 declare module "discord.js" {
     interface Client {
-        cooldowns: Map<any, any>;
-        commands: Map<any, any>;
-        REST: REST;
+        cooldowns: Map<any, any>
+        commands: Map<any, any>
+        REST: REST
     }
 }
 
