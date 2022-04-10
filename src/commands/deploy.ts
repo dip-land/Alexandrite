@@ -1,4 +1,4 @@
-import { type Message, type Client } from 'discord.js';
+import { Message, Client } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { command } from "../types/command";
 
@@ -8,10 +8,27 @@ export default async (message: Message, client: Client, args: any): Promise<void
     try {
         client.commands.forEach((command:command) => {
             if (!command.data) return;
+            let newOptions;
+            if(command.data?.options) {
+                let a = JSON.stringify(command.data?.options);
+                newOptions = JSON.parse(
+                    a.replaceAll('"type":"SUB_COMMAND"', '"type":1')
+                    .replaceAll('"type":"SUB_COMMAND_GROUP"', '"type":2')
+                    .replaceAll('"type":"STRING"', '"type":3')
+                    .replaceAll('"type":"INTEGER"', '"type":4')
+                    .replaceAll('"type":"BOOLEAN"', '"type":5')
+                    .replaceAll('"type":"USER"', '"type":6')
+                    .replaceAll('"type":"CHANNEL"', '"type":7')
+                    .replaceAll('"type":"ROLE"', '"type":8')
+                    .replaceAll('"type":"MENTIONABLE"', '"type":9')
+                    .replaceAll('"type":"NUMBER"', '"type":10')
+                    .replaceAll('"type":"ATTACHMENT"', '"type":11')
+                );
+            }
             let data = {
                 name: command.data?.name,
                 description: command.data?.description,
-                options: command.data?.options,
+                options: newOptions || [],
             }
             commands.push(data)
         })

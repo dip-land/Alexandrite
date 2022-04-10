@@ -3,8 +3,7 @@ import { applicationCommand } from "../../types/applicationCommand";
 
 export const data: applicationCommand = {
     name: 'ping',
-    description: 'Ping Command.',
-    options: []
+    description: 'Ping Command.'
 };
 
 export default async (client: Client, interaction: BaseCommandInteraction): Promise<void> => {

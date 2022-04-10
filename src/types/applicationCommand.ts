@@ -6,7 +6,7 @@ export type applicationCommand = {
     /**	1-100 character description for CHAT_INPUT commands, empty string for USER and MESSAGE commands*/
     description: string,
     /**the parameters for the command, max 25*/
-    options: ApplicationCommandOption[],
+    options?: ApplicationCommandOption[],
     /**Required permissions to use command*/
     permissions?: string,
     /**If the commmand can only be used in nsfw or dm channels*/
