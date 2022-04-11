@@ -1,7 +1,7 @@
 import { Client, Collection } from 'discord.js';
 import { REST } from '@discordjs/rest';
 import { Sequelize } from 'sequelize';
-import { start } from './handlers/userData';
+import { start } from './handlers/database';
 import 'dotenv/config';
 import { glob } from 'glob';
 import interactionCreate from './events/interactionCreate';

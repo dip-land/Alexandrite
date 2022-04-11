@@ -12,6 +12,7 @@ function delete_(userID: string) {
 }
 
 async function execute(message: Message) {
+    if (message.author.bot) return;
     let foundUser: User = await find(`U${message.author.id}; G${message.guildId};`);
     if (foundUser) {
         if (foundUser.xp >= ((foundUser.level * 1000) * 1.35)) {

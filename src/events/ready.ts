@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import { sync } from '../handlers/userData';
+import { sync } from '../handlers/database';
 
 export default (client: Client): void => {
     client.on("ready", async () => {

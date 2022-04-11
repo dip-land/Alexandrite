@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { execute } from '../handlers/userData';
+import { execute } from '../handlers/database';
 import deploy from '../commands/deploy';
 import { prefixes } from '../../config';
 
