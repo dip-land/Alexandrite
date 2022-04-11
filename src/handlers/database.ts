@@ -116,7 +116,7 @@ function update(options: { user?: { ID: string, xp: number, level: number, messa
 
 declare module "sequelize" {
     interface Model {
-        create(obj: {})
+        create(obj: {});
         destroy(pointer: { where: {} });
         findOne(pointer: { where: {} });
         sync();

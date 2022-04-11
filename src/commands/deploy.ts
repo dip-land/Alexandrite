@@ -7,8 +7,8 @@ export default async (message: Message, client: Client, args: any): Promise<void
     let commands = [];
     try {
         client.commands.forEach((command:command) => {
-            if (!command.data) return;
             let newOptions;
+            if (!command.data) return;
             if(command.data?.options) {
                 let a = JSON.stringify(command.data?.options);
                 newOptions = JSON.parse(
