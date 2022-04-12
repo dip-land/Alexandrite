@@ -1,4 +1,4 @@
-import { BaseCommandInteraction, Client } from "discord.js";
+import { BaseCommandInteraction } from "discord.js";
 import { applicationCommand } from "../../types/applicationCommand";
 
 export const data: applicationCommand = {
@@ -6,6 +6,6 @@ export const data: applicationCommand = {
     description: 'Ping Command.'
 };
 
-export default async (client: Client, interaction: BaseCommandInteraction): Promise<void> => {
+export default async (interaction: BaseCommandInteraction): Promise<void> => {
     interaction.reply('pong!')
 }

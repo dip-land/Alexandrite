@@ -6,7 +6,7 @@ export default (client: Client): void => {
         //if (interaction.isApplicationCommand()) console.log(interaction);
         if (interaction.isAutocomplete()) console.log(interaction);
         if (interaction.isButton()) console.log(interaction);
-        if (interaction.isCommand()) commandInteraction(client, interaction);
+        if (interaction.isCommand()) commandInteraction(interaction);
         if (interaction.isContextMenu()) console.log(interaction);
         if (interaction.isMessageComponent()) console.log(interaction);
         if (interaction.isMessageContextMenu()) console.log(interaction);

@@ -1,12 +1,12 @@
-import { Message, Client } from 'discord.js';
+import { Message } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { command } from "../types/command";
 
-export default async (message: Message, client: Client, args: any): Promise<void> => {
+export default async (message: Message, args: any): Promise<void> => {
     let reply = await message.reply(`Started refreshing application (/) commands.`);
     let commands = [];
     try {
-        client.commands.forEach((command:command) => {
+        message.client.commands.forEach((command:command) => {
             let newOptions;
             if (!command.data) return;
             if(command.data?.options) {
@@ -33,14 +33,14 @@ export default async (message: Message, client: Client, args: any): Promise<void
             commands.push(data)
         })
         if (args && args === '-global') {
-            await client.REST.put(
-                Routes.applicationCommands(client.user.id),
+            await message.client.REST.put(
+                Routes.applicationCommands(message.client.user.id),
                 { body: commands }
             );
             await reply.edit({ content: 'Successfully reloaded application (/) commands.' });
         } else {
-            await client.REST.put(
-                Routes.applicationGuildCommands(client.user.id, message.guildId),
+            await message.client.REST.put(
+                Routes.applicationGuildCommands(message.client.user.id, message.guildId),
                 { body: commands }
             );
             await reply.edit({ content: 'Successfully reloaded guild (/) commands.' });
