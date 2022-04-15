@@ -4,17 +4,17 @@ import { Model, DataTypes } from 'sequelize';
 let users: Model = null;
 let guilds: Model = null;
 
-function add(options: { userID?: string, guildID?: string }) {
-    if (options.userID) {
-        users.create({ userID: options.userID });
+function add(options: { user?: { id: string, guildID: string }, guildID?: string }) {
+    if (options.user) {
+        users.create({ userID: options.user.id, guildID: options.user.guildID });
     } else if (options.guildID) {
         guilds.create({ guildID: options.guildID });
     }
 }
 
-function delete_(options: { userID?: string, guildID?: string }) {
-    if (options.userID) {
-        users.destroy({ where: { userID: options.userID } });
+function delete_(options: { user?: { id: string, guildID: string }, guildID?: string }) {
+    if (options.user) {
+        users.destroy({ where: { userID: options.user.id, guildID: options.user.guildID } });
     } else if (options.guildID) {
         guilds.destroy({ where: { guildID: options.guildID } });
     }
@@ -22,21 +22,21 @@ function delete_(options: { userID?: string, guildID?: string }) {
 
 async function execute(message: Message) {
     if (message.author.bot) return;
-    let foundUser: User = await find({ userID: `U${message.author.id}; G${message.guildId};` });
+    let foundUser: User = await find({ user: { id: message.author.id, guildID: message.guildId } });
     if (foundUser) {
         if (foundUser.xp >= ((foundUser.level * 1000) * 1.35)) {
-            update({ user: { ID: foundUser.userID, xp: 0, level: foundUser.level + 1, messages: foundUser.messages + 1 } });
+            update({ user: { id: foundUser.userID, guildID: message.guildId, xp: 0, level: foundUser.level + 1, messages: foundUser.messages + 1 } });
         } else {
-            update({ user: { ID: foundUser.userID, xp: foundUser.xp + Math.floor(Math.random() * 20) + 10, level: foundUser.level, messages: foundUser.messages + 1 } });
+            update({ user: { id: foundUser.userID, guildID: message.guildId, xp: foundUser.xp + Math.floor(Math.random() * 20) + 10, level: foundUser.level, messages: foundUser.messages + 1 } });
         }
     } else {
-        add({ userID: `U${message.author.id}; G${message.guildId};` });
+        add({ user: { id: message.author.id, guildID: message.guildId } });
     }
 }
 
-async function find(options: { userID?: string, guildID?: string }) {
-    if (options.userID) {
-        const foundUser = await users.findOne({ where: { userID: options.userID } });
+async function find(options: { user?: { id: string, guildID: string }, guildID?: string }) {
+    if (options.user) {
+        const foundUser = await users.findOne({ where: { userID: options.user.id, guildID: options.user.guildID } });
         try {
             return foundUser.dataValues;
         } catch (error) {
@@ -57,6 +57,10 @@ function start(db) {
         userID: {
             type: DataTypes.STRING,
             unique: true,
+        },
+        guildID: {
+            type: DataTypes.STRING,
+            unique: false,
         },
         xp: {
             type: DataTypes.INTEGER,
@@ -87,7 +91,7 @@ function sync() {
     guilds.sync();
 }
 
-function update(options: { user?: { ID: string, xp: number, level: number, messages: number }, guild?: { ID: string } }) {
+function update(options: { user?: { id: string, guildID: string, xp: number, level: number, messages: number }, guild?: { ID: string } }) {
     if (options.user) {
         users.update(
             {
@@ -97,7 +101,8 @@ function update(options: { user?: { ID: string, xp: number, level: number, messa
             },
             {
                 where: {
-                    userID: options.user.ID,
+                    userID: options.user.id,
+                    guildID: options.user.guildID
                 }
             }
         );
@@ -126,6 +131,7 @@ declare module "sequelize" {
 declare type User = {
     id: number,
     userID: string,
+    guildID: string,
     xp: number,
     level: number,
     messages: number,
