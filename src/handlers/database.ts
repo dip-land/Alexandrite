@@ -124,10 +124,13 @@ declare module "sequelize" {
 }
 
 declare type User = {
+    id: number,
     userID: string,
     xp: number,
     level: number,
-    messages: number
+    messages: number,
+    createdAt: Date,
+    updatedAt: Date
 }
 
-export { add, delete_, execute, find, start, sync, update }
+export { add, delete_, execute, find, start, sync, update, User }
