@@ -7,17 +7,17 @@ import * as dominantColors from 'dominant-colors';
 
 export const data: applicationCommand = {
     name: 'rank',
-    description: 'Display your rank card or someone elses.',
+    description: 'Display your rank card or someone elses',
     options: [
         {
             type: 'USER',
             name: 'target',
-            description: 'User to display.'
+            description: 'User to display'
         },
         {
             type: 'BOOLEAN',
             name: 'hide',
-            description: 'Whether to hide the response or not.'
+            description: 'Whether to hide the response or not'
         }
     ]
 };
