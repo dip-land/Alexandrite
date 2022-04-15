@@ -3,7 +3,6 @@ import commandInteraction from '../handlers/commandInteraction';
 
 export default (client: Client): void => {
     client.on('interactionCreate', async (interaction: Interaction) => {
-        //if (interaction.isApplicationCommand()) console.log(interaction);
         if (interaction.isAutocomplete()) console.log(interaction);
         if (interaction.isButton()) console.log(interaction);
         if (interaction.isCommand()) commandInteraction(interaction);

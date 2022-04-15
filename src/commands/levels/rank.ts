@@ -1,6 +1,6 @@
 import { BaseCommandInteraction, MessageAttachment } from 'discord.js';
 import { applicationCommand } from '../../types/applicationCommand';
-import { find, add, User } from '../../handlers/database';
+import { find, add } from '../../handlers/database';
 import * as Canvas from 'canvas';
 import { rectangle, progressBar, scaleFont, text } from '../../handlers/canvas';
 import * as dominantColors from 'dominant-colors';
@@ -27,7 +27,7 @@ export default async (interaction: BaseCommandInteraction): Promise<void> => {
     const target = data[0]?.user || interaction.user;
     const hide = data[0]?.type === 'BOOLEAN' ? !!data[0]?.value : !!data[1]?.value || false;
     if (target.bot) return interaction.reply('Sadly bots cannot have rank cards...');
-    let stats: User = await find({ user: { id: target.id, guildID: interaction.guildId } });
+    let stats = await find({ user: { id: target.id, guildID: interaction.guildId } });
     if (!stats) {
         add({ user: { id: target.id, guildID: interaction.guildId } });
         stats = await find({ user: { id: target.id, guildID: interaction.guildId } });

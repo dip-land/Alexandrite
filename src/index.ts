@@ -1,7 +1,5 @@
 import { Client, Collection } from 'discord.js';
 import { REST } from '@discordjs/rest';
-import { Sequelize } from 'sequelize';
-import { start } from './handlers/database';
 import 'dotenv/config';
 import { glob } from 'glob';
 import interactionCreate from './events/interactionCreate';
@@ -33,13 +31,6 @@ const client = new Client(
 client.cooldowns = new Collection();
 client.commands = new Collection();
 client.REST = new REST({ version: '9' }).setToken(process.env.TOKEN);
-
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    logging: false,
-    storage: 'database.sqlite',
-});
-start(sequelize);
 
 glob('./dist/src/commands/**/*.js', function (err, res) {
     res.forEach(async cmd => {
