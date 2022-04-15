@@ -86,6 +86,11 @@ async function find(options: { user?: { id: string, guildID: string }, guildID?:
     }
 }
 
+async function order(guildID) {
+    let allUsers = await users.findAll({where: {guildID :guildID}});
+    console.log(allUsers)
+}
+
 function sync() {
     users.sync();
     guilds.sync();
@@ -140,4 +145,4 @@ declare type dataValues = {
     updatedAt?: Date
 }
 
-export { add, delete_, execute, find, sync, update }
+export { add, delete_, execute, find, order, sync, update }
