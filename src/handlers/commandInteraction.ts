@@ -1,4 +1,4 @@
-import { BaseCommandInteraction } from "discord.js";
+import { BaseCommandInteraction } from 'discord.js';
 
 export default async (interaction: BaseCommandInteraction): Promise<void> => {
     const command = interaction.client.commands.get(interaction.commandName);

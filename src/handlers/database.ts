@@ -119,7 +119,7 @@ function update(options: { user?: { id: string, guildID: string, xp: number, lev
     }
 }
 
-declare module "sequelize" {
+declare module 'sequelize' {
     interface Model {
         create(obj: {});
         destroy(pointer: { where: {} });
@@ -135,6 +135,14 @@ declare type User = {
     xp: number,
     level: number,
     messages: number,
+    createdAt: Date,
+    updatedAt: Date
+}
+
+declare type Guild = {
+    id: number,
+    guildID: string,
+
     createdAt: Date,
     updatedAt: Date
 }

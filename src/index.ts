@@ -8,7 +8,7 @@ import interactionCreate from './events/interactionCreate';
 import messageCreate from './events/messageCreate';
 import ready from './events/ready';
 
-declare module "discord.js" {
+declare module 'discord.js' {
     interface Client {
         cooldowns: Map<any, any>
         commands: Map<any, any>

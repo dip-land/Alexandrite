@@ -1,4 +1,4 @@
-import { ApplicationCommandOption } from "discord.js";
+import { ApplicationCommandOption } from 'discord.js';
 
 export type applicationCommand = {
     /**1-32 lowercase character name*/

@@ -1,8 +1,8 @@
-import { Client, Interaction } from "discord.js";
-import commandInteraction from "../handlers/commandInteraction";
+import { Client, Interaction } from 'discord.js';
+import commandInteraction from '../handlers/commandInteraction';
 
 export default (client: Client): void => {
-    client.on("interactionCreate", async (interaction: Interaction) => {
+    client.on('interactionCreate', async (interaction: Interaction) => {
         //if (interaction.isApplicationCommand()) console.log(interaction);
         if (interaction.isAutocomplete()) console.log(interaction);
         if (interaction.isButton()) console.log(interaction);

@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
-import { command } from "../types/command";
+import { command } from '../types/command';
 
 export default async (message: Message, args: any): Promise<void> => {
     let reply = await message.reply(`Started refreshing application (/) commands.`);
@@ -12,17 +12,17 @@ export default async (message: Message, args: any): Promise<void> => {
             if(command.data?.options) {
                 let a = JSON.stringify(command.data?.options);
                 newOptions = JSON.parse(
-                    a.replaceAll('"type":"SUB_COMMAND"', '"type":1')
-                    .replaceAll('"type":"SUB_COMMAND_GROUP"', '"type":2')
-                    .replaceAll('"type":"STRING"', '"type":3')
-                    .replaceAll('"type":"INTEGER"', '"type":4')
-                    .replaceAll('"type":"BOOLEAN"', '"type":5')
-                    .replaceAll('"type":"USER"', '"type":6')
-                    .replaceAll('"type":"CHANNEL"', '"type":7')
-                    .replaceAll('"type":"ROLE"', '"type":8')
-                    .replaceAll('"type":"MENTIONABLE"', '"type":9')
-                    .replaceAll('"type":"NUMBER"', '"type":10')
-                    .replaceAll('"type":"ATTACHMENT"', '"type":11')
+                    a.replaceAll(''type':'SUB_COMMAND'', ''type':1')
+                    .replaceAll(''type':'SUB_COMMAND_GROUP'', ''type':2')
+                    .replaceAll(''type':'STRING'', ''type':3')
+                    .replaceAll(''type':'INTEGER'', ''type':4')
+                    .replaceAll(''type':'BOOLEAN'', ''type':5')
+                    .replaceAll(''type':'USER'', ''type':6')
+                    .replaceAll(''type':'CHANNEL'', ''type':7')
+                    .replaceAll(''type':'ROLE'', ''type':8')
+                    .replaceAll(''type':'MENTIONABLE'', ''type':9')
+                    .replaceAll(''type':'NUMBER'', ''type':10')
+                    .replaceAll(''type':'ATTACHMENT'', ''type':11')
                 );
             }
             let data = {
