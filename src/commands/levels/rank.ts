@@ -23,9 +23,8 @@ export const data: applicationCommand = {
 };
 
 export default async (interaction: BaseCommandInteraction): Promise<void> => {
-    const data = interaction.options.data;
-    const target = data[0]?.user || interaction.user;
-    const hide = data[0]?.type === 'BOOLEAN' ? !!data[0]?.value : !!data[1]?.value || false;
+    const target = interaction.options.getUser('target', false) || interaction.user;
+    const hide = !!interaction.options.get('hide')?.value || false;
     if (target.bot) return interaction.reply('Sadly bots cannot have rank cards...');
     let stats = await find({ user: { id: target.id, guildID: interaction.guildId } });
     if (!stats) {
@@ -87,7 +86,7 @@ export default async (interaction: BaseCommandInteraction): Promise<void> => {
 
     new text(context).setText(`Messages - ${stats.messages.toLocaleString()}`).setPosition(width / 2.5, height / 1.5).setFormating({ stroke: true, maxWidth: width / 2 }).setColor('#fff').end();
 
-    new rectangle(context).setColor('#1c1c1e').setPosition((width / 2.5) - 8, (height / 1.4) - 8).setRadius(36).setSize((width / 2) + 8, 64).end();
+    new rectangle(context).setColor('#00000040').setPosition((width / 2.5) - 8, (height / 1.4) - 8).setRadius(36).setSize((width / 2) + 8, 64).end();
     new progressBar(context)
         .displayText(`${Math.floor(userXpPercent * 100)}% (${stats.xp}xp / ${(stats.level * 1000) * 1.35}xp)`, 'bold 40px arial', '#fff')
         .setColor(userColor)

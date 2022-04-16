@@ -1,10 +1,13 @@
-import { Message } from 'discord.js';
-import { ModelStatic, DataTypes, Sequelize } from 'sequelize';
+import { Message, Collection } from 'discord.js';
+import { DataTypes, Sequelize } from 'sequelize';
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     logging: false,
     storage: 'database.sqlite',
 });
+
+const cooldown: Collection<string, number> = new Collection();
+const cooldownAmount = 30;
 
 let users = sequelize.define('Users', {
     userID: {
@@ -35,31 +38,48 @@ let guilds = sequelize.define('Guilds', {
     guildID: {
         type: DataTypes.STRING,
         unique: true,
+    },
+    levelUpChannel: {
+        type: DataTypes.STRING
     }
 });
 
 function add(options: { user?: { id: string, guildID: string }, guildID?: string }) {
     if (options.user) {
-        users.create({ userID: options.user.id, guildID: options.user.guildID });
+        users.create({ userID: options.user.id, guildID: options.user.guildID, xp: Math.floor(Math.random() * 20) + 10 });
+        sync();
     } else if (options.guildID) {
         guilds.create({ guildID: options.guildID });
+        sync();
     }
 }
 
-function delete_(options: { user?: { id: string, guildID: string }, guildID?: string }) {
+function remove(options: { user?: { id: string, guildID: string }, guildID?: string }) {
     if (options.user) {
         users.destroy({ where: { userID: options.user.id, guildID: options.user.guildID } });
+        sync();
     } else if (options.guildID) {
         guilds.destroy({ where: { guildID: options.guildID } });
+        sync();
     }
 }
 
 async function execute(message: Message) {
     if (message.author.bot) return;
-    let foundUser = await find({ user: { id: message.author.id, guildID: message.guildId } });
+    const foundUser = await find({ user: { id: message.author.id, guildID: message.guildId } });
+
+    if (foundUser && cooldown.has(message.author.id)) {
+        update({ user: { id: foundUser.userID, guildID: message.guildId, xp: foundUser.xp, level: foundUser.level, messages: foundUser.messages + 1 } });
+        const expirationTime = cooldown.get(message.author.id) + (cooldownAmount * 1000);
+        if (Date.now() < expirationTime) return;
+    }
+
+    cooldown.set(message.author.id, Date.now());
+    setTimeout(() => cooldown.delete(message.author.id), (cooldownAmount * 1000));
+
     if (foundUser) {
         if (foundUser.xp >= ((foundUser.level * 1000) * 1.35)) {
-            update({ user: { id: foundUser.userID, guildID: message.guildId, xp: 0, level: foundUser.level + 1, messages: foundUser.messages + 1 } });
+            update({ user: { id: foundUser.userID, guildID: message.guildId, xp: foundUser.xp - ((foundUser.level * 1000) * 1.35), level: foundUser.level + 1, messages: foundUser.messages + 1 } });
         } else {
             update({ user: { id: foundUser.userID, guildID: message.guildId, xp: foundUser.xp + Math.floor(Math.random() * 20) + 10, level: foundUser.level, messages: foundUser.messages + 1 } });
         }
@@ -86,9 +106,12 @@ async function find(options: { user?: { id: string, guildID: string }, guildID?:
     }
 }
 
-async function order(guildID) {
-    let allUsers = await users.findAll({where: {guildID :guildID}});
-    console.log(allUsers)
+async function sort(guildID: string) {
+    let _users = []
+    let users_ = await users.findAll({ where: { guildID: guildID } })
+    users_.forEach(user => _users.push(user.dataValues))
+
+    return _users.sort((a, b) => ((b.xp / ((b.level * 1000) * 1.35)) + b.level * 100) - ((a.xp / ((a.level * 1000) * 1.35)) + a.level * 100));
 }
 
 function sync() {
@@ -96,7 +119,7 @@ function sync() {
     guilds.sync();
 }
 
-function update(options: { user?: { id: string, guildID: string, xp: number, level: number, messages: number }, guild?: { ID: string } }) {
+function update(options: { user?: { id: string, guildID: string, xp: number, level: number, messages: number }, guild?: { ID: string, levelUpChannel: string } }) {
     if (options.user) {
         users.update(
             {
@@ -111,9 +134,11 @@ function update(options: { user?: { id: string, guildID: string, xp: number, lev
                 }
             }
         );
+        sync();
     } else if (options.guild) {
         guilds.update(
             {
+                levelUpChannel: options.guild.levelUpChannel
             },
             {
                 where: {
@@ -121,6 +146,7 @@ function update(options: { user?: { id: string, guildID: string, xp: number, lev
                 }
             }
         );
+        sync();
     }
 }
 
@@ -135,14 +161,15 @@ declare module 'sequelize' {
 }
 
 declare type dataValues = {
-    id?: number,
-    userID?: string,
-    guildID?: string,
-    xp?: number,
-    level?: number,
-    messages?: number,
-    createdAt?: Date,
+    id?: number
+    userID?: string
+    guildID?: string
+    xp?: number
+    level?: number
+    levelUpChannel?: string
+    messages?: number
+    createdAt?: Date
     updatedAt?: Date
 }
 
-export { add, delete_, execute, find, order, sync, update }
+export { add, dataValues, execute, find, remove, sort, sync, update }
