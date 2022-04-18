@@ -18,12 +18,8 @@ const client = new Client(
     {
         intents: [
             'GUILDS',
-            'GUILD_PRESENCES',
             'GUILD_MEMBERS',
-            'GUILD_BANS',
-            'GUILD_INVITES',
             'GUILD_MESSAGES',
-            'GUILD_VOICE_STATES',
         ]
     }
 )
