@@ -14,13 +14,15 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": "./"
+        "baseUrl": "./",
+        "skipLibCheck": true
     },
     "include": [
         "./**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "node_modules/discord.js/typings"
     ],
 }

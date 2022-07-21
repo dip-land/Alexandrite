@@ -1,35 +1,35 @@
-import { BaseCommandInteraction, MessageAttachment } from 'discord.js';
-import { applicationCommand } from '../../types/applicationCommand';
+import { ApplicationCommandData, ApplicationCommandType, ApplicationCommandOptionType, Attachment, CommandInteraction } from 'discord.js';
 import { sort } from '../../handlers/database';
 import * as Canvas from 'canvas';
 import { rectangle, text } from '../../handlers/canvas';
 
 const usersPerPage = 10;
 
-export const data: applicationCommand = {
+export const data: ApplicationCommandData = {
     name: 'levels',
     description: 'Shows the leaderboard for current server',
+    type: ApplicationCommandType.ChatInput,
     options: [
         {
-            type: 'INTEGER',
             name: 'page',
-            description: `leaderboard page, each page displays ${usersPerPage} users`
+            description: `leaderboard page, each page displays ${usersPerPage} users`,
+            type: ApplicationCommandOptionType.Integer
         },
         {
-            type: 'BOOLEAN',
             name: 'hide',
-            description: 'Whether to hide the response or not'
+            description: 'Whether to hide the response or not',
+            type: ApplicationCommandOptionType.Boolean
         }
     ]
 };
 
-export default async (interaction: BaseCommandInteraction): Promise<any> => {
+export default async (interaction: CommandInteraction): Promise<any> => {
     const hide = !!interaction.options.get('hide')?.value || false;
     await interaction.deferReply({ ephemeral: hide });
-    const page = parseInt(`${interaction.options.get('page')?.value}`) || 1;
-    const users = await sort(interaction.guildId);
+    const page = (+`${interaction.options.get('page')?.value}`) || 1;
+    const users = await sort('users', { guildID: interaction.guildId }, true);
     const pages = users.length / usersPerPage;
-    if(page > Math.ceil(pages) || page <= 0) return await interaction.editReply({content: 'Requested page is invalid.'});
+    if (page > Math.ceil(pages) || page <= 0) return await interaction.editReply({ content: 'Requested page is invalid.' });
     const width = 1400;
     const height = (users.length * 120) <= usersPerPage * 140 ? (users.length * 140) + 280 : (usersPerPage * 140) + 280;
     const canvas = Canvas.createCanvas(width, height);
@@ -79,7 +79,7 @@ export default async (interaction: BaseCommandInteraction): Promise<any> => {
             setupUser(fetchedUser, user, index, yValue);
 
             if (index + 1 === usersDisplayed.length) send();
-        } catch (error) {
+        } catch (err) {
             let erroredUser = { tag: user.userID }
             setupUser(erroredUser, user, index, yValue);
             if (index + 1 === usersDisplayed.length) send();
@@ -98,7 +98,7 @@ export default async (interaction: BaseCommandInteraction): Promise<any> => {
     }
 
     async function send() {
-        const attachment = new MessageAttachment(canvas.toBuffer(), `${interaction.guildId}_LeaderBoard.png`);
+        const attachment = new Attachment(canvas.toBuffer(), `${interaction.guildId}_LeaderBoard.png`);
         await interaction.editReply({ files: [attachment] });
     }
 }

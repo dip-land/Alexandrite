@@ -1,20 +1,21 @@
 import { Message } from 'discord.js';
 import { add } from '../handlers/database';
+import log from '../handlers/log';
 
-export default async (message: Message, args: any): Promise<void> => {
+export default async (message: Message, args: any): Promise<any> => {
     let reply = await message.reply(`Started userGeneration ${args[0]}.`);
     try {
-        let amount = parseInt(args[1]);
+        let amount = (+args[1]);
         do {
             let ID = makeid(18);
-            console.log(ID, amount)
-            add({ user: { guildID: message.guildId, id: ID } })
+            new log().log(ID, amount);
+            add('user', { guildID: message.guildId, userID: ID });
             amount--;
             if (amount === 0) reply.edit({ content: 'Finished userGeneration.' });
         } while (amount > 0);
     } catch (err) {
-        reply.edit({ content: 'There was an error generating users.' })
-        console.log(err);
+        reply.edit({ content: 'There was an error generating users.' });
+        new log().error(err);
     }
 }
 

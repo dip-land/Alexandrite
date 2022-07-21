@@ -1,11 +1,12 @@
 import { ApplicationCommandData, ApplicationCommandType, CommandInteraction } from 'discord.js';
 
 export const data: ApplicationCommandData = {
-    name: 'ping',
-    description: 'Ping Command.',
-    type: ApplicationCommandType.ChatInput
+    name: 'removexp',
+    description: 'Placholder',
+    type: ApplicationCommandType.ChatInput,
+    defaultPermission: false
 };
 
 export default async (interaction: CommandInteraction): Promise<any> => {
-    interaction.reply('pong!');
+    interaction.reply('This command currently does not work.');
 }

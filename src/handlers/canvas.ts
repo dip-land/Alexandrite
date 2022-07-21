@@ -1,10 +1,52 @@
 import { CanvasRenderingContext2D, Canvas } from 'canvas';
+import log from './log';
+
+class circle {
+    constructor(context: CanvasRenderingContext2D) {
+        this.context = context;
+    }
+    end() {
+        this.context.beginPath();
+        this.context.arc(this.x + this.size, this.y + this.size, this.size, 0, Math.PI * 2, true);
+        if (this.clip) {
+            this.context.closePath();
+            this.context.clip();
+        } else {
+            this.context.fillStyle = this.color;
+            this.context.fill();
+        }
+    }
+    setClip(clip: boolean) {
+        this.clip = clip;
+        return this;
+    }
+    setColor(color: string) {
+        this.color = color;
+        return this;
+    }
+    setPosition(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+    setSize(size: number) {
+        this.size = size / 2;
+        return this;
+    }
+    clip: boolean;
+    color: string;
+    context: CanvasRenderingContext2D;
+    size: number;
+    x: number;
+    y: number;
+}
+
 class progressBar {
     constructor(context: CanvasRenderingContext2D) {
         this.context = context;
     }
     end() {
-        if (!this.context) return console.error(new Error('Context must be set.'));
+        if (!this.context) return new log().error(new Error('Context must be set.'));
         let minWidth = 0;
         if (this.width * this.percent < (this.radius * 1.5)) {
             minWidth = (this.radius * 1.5) - (this.width * this.percent);
@@ -18,12 +60,6 @@ class progressBar {
                 .setPosition(this.x + (this.width / 2), this.y + (this.height - (this.height / 5.25)))
                 .end()
         }
-    }
-    displayText(text: string, font: string, color: string) {
-        this.text = text;
-        this.textFont = font;
-        this.textColor = color;
-        return this;
     }
     setColor(color: string) {
         this.color = color;
@@ -41,6 +77,12 @@ class progressBar {
     setSize(width: number, height: number) {
         this.width = width;
         this.height = height;
+        return this;
+    }
+    setText(text: string, font: string, color: string) {
+        this.text = text;
+        this.textFont = font;
+        this.textColor = color;
         return this;
     }
     setRadius(radius: number) {
@@ -78,8 +120,17 @@ class rectangle {
         this.context.quadraticCurveTo(this.x, b, this.x, b - this.radius);
         this.context.lineTo(this.x, this.y + this.radius);
         this.context.quadraticCurveTo(this.x, this.y, this.x + this.radius, this.y);
-        this.context.fillStyle = this.color;
-        this.context.fill();
+        if (this.clip) {
+            this.context.closePath();
+            this.context.clip();
+        } else {
+            this.context.fillStyle = this.color;
+            this.context.fill();
+        }
+    }
+    setClip(clip: boolean) {
+        this.clip = clip;
+        return this;
     }
     setColor(color: string) {
         this.color = color;
@@ -99,6 +150,7 @@ class rectangle {
         this.radius = radius;
         return this;
     }
+    clip: boolean;
     color: string;
     context: CanvasRenderingContext2D;
     height: number;
@@ -108,12 +160,42 @@ class rectangle {
     y: number;
 }
 
+class scaleFont {
+    constructor(canvas: Canvas) {
+        this.canvas = canvas;
+    }
+    end() {
+        this.size = this.size | 110;
+        const context = this.canvas.getContext('2d');
+        do {
+            context.font = `${this.size -= 2}px ${this.font}`;
+        } while (context.measureText(this.text).width > this.canvas.width - this.number);
+
+        return context.font;
+    }
+    setFormating(options: { font?: string, size?: number, number: number }) {
+        this.font = options.font;
+        this.number = options.number;
+        this.size = options.size;
+        return this;
+    }
+    setText(text: string) {
+        this.text = text;
+        return this;
+    }
+    canvas: Canvas;
+    font: string;
+    number: number;
+    size: number = 110;
+    text: string;
+}
+
 class text {
     constructor(context: CanvasRenderingContext2D) {
         this.context = context;
     }
     end() {
-        if (!this.context) return console.error(new Error('Context must be set.'));
+        if (!this.context) return new log().error(new Error('Context must be set.'));
         if (this.font) this.context.font = this.font;
         if (this.size) this.context.font = `${this.size}px`;
         if (this.font && this.size) this.context.font = `${this.size}px ${this.font}`;
@@ -155,34 +237,4 @@ class text {
     y: number;
 }
 
-class scaleFont {
-    constructor(canvas: Canvas) {
-        this.canvas = canvas;
-    }
-    end() {
-        this.size = this.size | 110;
-        const context = this.canvas.getContext('2d');
-        do {
-            context.font = `${this.size -= 2}px ${this.font}`;
-        } while (context.measureText(this.text).width > this.canvas.width - this.number);
-
-        return context.font;
-    }
-    setFormating(options: { font?: string, size?: number, number: number }) {
-        this.font = options.font;
-        this.number = options.number;
-        this.size = options.size;
-        return this;
-    }
-    setText(text: string) {
-        this.text = text;
-        return this;
-    }
-    canvas: Canvas;
-    font: string;
-    number: number;
-    size: number = 110;
-    text: string;
-}
-
-export { progressBar, rectangle, text, scaleFont }
+export { circle, progressBar, rectangle, scaleFont, text }

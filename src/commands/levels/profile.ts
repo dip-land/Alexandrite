@@ -1,13 +1,13 @@
 import { ApplicationCommandData, ApplicationCommandType, ApplicationCommandOptionType, Attachment, CommandInteraction } from 'discord.js';
-import { find, maxXP, userValue } from '../../handlers/database';
+import { find, maxXP, sort, userValue } from '../../handlers/database';
 import * as Canvas from 'canvas';
 import { circle, progressBar, rectangle, text } from '../../handlers/canvas';
 import * as dominantColors from 'dominant-colors';
 import { testColors } from '../../handlers/colors';
 
 export const data: ApplicationCommandData = {
-    name: 'rank',
-    description: 'Display your rank card or someone elses',
+    name: 'profile',
+    description: 'Display your profile card or someone elses',
     type: ApplicationCommandType.ChatInput,
     options: [
         {
@@ -27,7 +27,7 @@ export default async (interaction: CommandInteraction): Promise<any> => {
     const target = interaction.options.getUser('target', false) || interaction.user;
     const hide = !!interaction.options.get('hide')?.value || false;
     await interaction.deferReply({ ephemeral: hide });
-    if (target.bot) return interaction.editReply('Sadly bots cannot have rank cards...');
+    if (target.bot) return interaction.editReply('Sadly bots cannot have profile cards...');
     let stats = await find('user', { userID: target.id, guildID: interaction.guildId }) as userValue;
     if (!stats) {
         stats = {
@@ -43,9 +43,11 @@ export default async (interaction: CommandInteraction): Promise<any> => {
     let userColor: string = testColors(fetchedUser.hexAccentColor, '#1b1b1c') || testColors((await dominantColors.showColors(bannerURL, 1))[0], '#1b1b1c') || '#ffffff';
     if (userColor === 'P') userColor = '#ffffff';
     const width = 480;
-    const height = 174;
+    const height = 288;
     const canvas = Canvas.createCanvas(width, height);
     const context = canvas.getContext('2d');
+    const guildSort = await sort('users', { guildID: interaction.guildId }, true);
+    const globalSort = await sort('users', { guildID: interaction.guildId });
 
     context.save();
     context.shadowColor = 'black';
@@ -66,20 +68,29 @@ export default async (interaction: CommandInteraction): Promise<any> => {
     context.shadowColor = '#00000080';
     context.shadowBlur = 6;
     new rectangle(context).setColor('#ffffff20').setPosition(20, height - 25).setRadius(2.5).setSize(width - 40, 5).end();
-    new progressBar(context).setColor(userColor).setPercent(stats.xp / maxXP(stats)).setPosition(20, height - 25).setRadius(2.5).setSize(width - 40, 5).end();
+    new progressBar(context).setColor(userColor).setPercent(stats.xp / ((stats.level * 1000) * 1.35)).setPosition(20, height - 25).setRadius(2.5).setSize(width - 40, 5).end();
 
-    new text(context).setColor(userColor).setFormating({ align: 'center', font: 'bold 36px arial', maxWidth: 290 }).setPosition(302, height / 2).setText(fetchedUser.username).end();
-    new text(context).setColor('#ffffffb0').setFormating({ align: 'right', font: 'bold 12px arial' }).setPosition(width - 30, height - 30).setText(`LEVEL ${stats.level}`).end();
-    new text(context).setColor('#ffffffb0').setFormating({ align: 'left', font: 'bold 12px arial' }).setPosition(154, height - 30).setText(`${stats.xp} / ${maxXP(stats)} EXP`).end();
+    new text(context).setColor(userColor).setFormating({ align: "left", font: "bold 36px arial", maxWidth: 200 }).setPosition(154, 75).setText(fetchedUser.username).end();
+    new text(context).setColor(userColor).setFormating({ align: "left", font: "bold 26px arial", maxWidth: 200 }).setPosition(154, 104).setText(`#${fetchedUser.discriminator}`).end();
+    new text(context).setColor("#ffffffb0").setFormating({ align: "center", font: "bold 26px arial", maxWidth: 80 }).setPosition(width - 70, 72).setText(`LEVEL`).end();
+    new text(context).setFormating({ align: "center", font: "bold 36px arial", maxWidth: 80 }).setPosition(width - 70, 106).setText(`${stats.level}`).end();
+    new text(context).setFormating({ align: "left", font: "bold 20px arial" }).setPosition(20, 165).setText(`MESSAGES`).end();
+    new text(context).setFormating({ align: "right", font: "bold 20px arial", maxWidth: 200 }).setPosition(width - 20, 165).setText(`${stats.messages}`).end();
+    new text(context).setFormating({ align: "left", font: "bold 20px arial" }).setPosition(20, 195).setText(`GLOBAL RANK`).end();
+    new text(context).setFormating({ align: "right", font: "bold 20px arial", maxWidth: 200 }).setPosition(width - 20, 195).setText(`${globalSort.findIndex((element) => element.id === stats.id) + 1}`).end();
+    new text(context).setFormating({ align: "left", font: "bold 20px arial" }).setPosition(20, 225).setText(`SERVER RANK`).end();
+    new text(context).setFormating({ align: "right", font: "bold 20px arial", maxWidth: 200 }).setPosition(width - 20, 225).setText(`${guildSort.findIndex((element) => element.id === stats.id) + 1}`).end();
+    new text(context).setFormating({ align: "left", font: "bold 20px arial" }).setPosition(20, 255).setText(`EXPERIENCE`).end();
+    new text(context).setFormating({ align: "right", font: "bold 20px arial", maxWidth: 200 }).setPosition(width - 20, 255).setText(`${stats.xp} / ${maxXP(stats)}`).end();
     context.restore();
 
     context.save();
-    new circle(context).setClip(true).setPosition(20, 20).setSize(height - 55).end();
+    new circle(context).setClip(true).setPosition(20, 20).setSize(119).end();
     const avatar = await Canvas.loadImage(target.displayAvatarURL({ extension: 'jpg', size: 128 }));
-    context.drawImage(avatar, 20, 20, height - 55, height - 55);
+    context.drawImage(avatar, 20, 20, 119, 119);
     context.restore();
 
-    const attachment = new Attachment(canvas.toBuffer(), `${target.id}_RankCard.png`);
+    const attachment = new Attachment(canvas.toBuffer(), `${target.id}_ProfileCard.png`);
 
     interaction.editReply({ files: [attachment] });
 }

@@ -1,5 +1,11 @@
-import { applicationCommand } from './applicationCommand'
+import { ApplicationCommandData, PermissionResolvable, CommandInteraction } from "discord.js";
+
 export type command = {
-    data: applicationCommand,
-    default: Promise<void>
+    data: ApplicationCommandData,
+    extendedData: {
+        disabled: boolean,
+        nsfw: boolean,
+        permissions: PermissionResolvable
+    },
+    default: (interaction: CommandInteraction) => Promise<any>
 }

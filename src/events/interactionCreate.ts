@@ -1,15 +1,16 @@
 import { Client, Interaction } from 'discord.js';
+import log from '../handlers/log';
 import commandInteraction from '../handlers/commandInteraction';
 
 export default (client: Client): void => {
     client.on('interactionCreate', async (interaction: Interaction) => {
-        if (interaction.isAutocomplete()) console.log(interaction);
-        if (interaction.isButton()) console.log(interaction);
+        if (interaction.isAutocomplete()) new log().log(interaction);
+        if (interaction.isButton()) new log().log(interaction);
         if (interaction.isCommand()) commandInteraction(interaction);
-        if (interaction.isContextMenu()) console.log(interaction);
-        if (interaction.isMessageComponent()) console.log(interaction);
-        if (interaction.isMessageContextMenu()) console.log(interaction);
-        if (interaction.isSelectMenu()) console.log(interaction);
-        if (interaction.isUserContextMenu()) console.log(interaction);
+        if (interaction.isContextMenuCommand()) new log().log(interaction);
+        if (interaction.isMessageComponent()) new log().log(interaction);
+        if (interaction.isMessageContextMenuCommand()) new log().log(interaction);
+        if (interaction.isSelectMenu()) new log().log(interaction);
+        if (interaction.isUserContextMenuCommand()) new log().log(interaction);
     });
 };
